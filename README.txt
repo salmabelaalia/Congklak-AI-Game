@@ -2,7 +2,6 @@
 Intelligence Artificielle pour le jeu traditionnel Congklak
 Projet universitaire M1 IA - Implémentation complète des règles de recherche
 
-https://image.png
 
 ============================================================
 📋 TABLE DES MATIÈRES
@@ -35,14 +34,14 @@ Objectifs principaux :
 ============================================================
 L’implémentation suit exactement les 8 règles définies dans l’article :
 
-1. Plateau avec 16 trous (14 petits + 2 homes)            [OK]
-2. 7 billes par trou (homes vides au départ)              [OK]
-3. Distribution anti-horaire (sowing)                     [OK]
-4. Rejouer si la dernière bille tombe dans son home       [OK]
-5. Capture (shooting) si dernière bille dans trou vide   [OK]
-6. Continuer si dernière bille dans trou occupé           [OK]
-7. Changement de joueur si aucun coup possible            [OK]
-8. Fin de jeu lorsque tous les trous sont vides           [OK]
+1. Plateau avec 16 trous (14 petits + 2 homes)            
+2. 7 billes par trou (homes vides au départ)              
+3. Distribution anti-horaire (sowing)                     
+4. Rejouer si la dernière bille tombe dans son home       
+5. Capture (shooting) si dernière bille dans trou vide   
+6. Continuer si dernière bille dans trou occupé           
+7. Changement de joueur si aucun coup possible            
+8. Fin de jeu lorsque tous les trous sont vides           
 
 Particularité :
 La règle 5 (capture) est entièrement fonctionnelle,
@@ -150,10 +149,10 @@ Tous les temps de décision sont inférieurs à 2 secondes.
 Objectif initial (< 5s) largement atteint.
 
 Tests fonctionnels :
-- Capture (règle 5)        : OK
-- Rejouer (règle 4)        : OK
-- Fin de partie            : OK
-- Multi-difficultés        : OK
+- Capture (règle 5)        
+- Rejouer (règle 4)        
+- Fin de partie            
+- Multi-difficultés        
 
 ============================================================
 📚 RÉFÉRENCES ACADÉMIQUES
