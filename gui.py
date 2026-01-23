@@ -1,275 +1,283 @@
-# gui.py - Interface graphique avec design modernisé
-import tkinter as tk
+# new_gui.py - Interface corrigée (sans numéros, IA fonctionnelle)
+import pygame
+import sys
 from game import CongklakGame
 from ai import CongklakAI
 
-class CongklakGUI:
+# Couleurs (Palette Terre Cuite / Bois)
+COLOR_BG = (255, 248, 220)      # Off-white
+COLOR_BOARD = (160, 82, 45)     # Sienna
+COLOR_HOLE = (101, 67, 33)      # Dark Wood
+COLOR_SEED = (34, 139, 34)      # Forest Green
+COLOR_PLAYER = (30, 144, 255)   # Blue for player
+COLOR_AI = (220, 20, 60)        # Red for AI
+COLOR_TEXT = (50, 50, 50)       # Dark gray
+
+class CongklakPygameGUI:
     def __init__(self):
+        pygame.init()
+        self.screen = pygame.display.set_mode((1000, 600))
+        pygame.display.set_caption("Congklak")
+        
         self.game = CongklakGame()
-        self.ai = CongklakAI(difficulty="medium")
+        self.ai = CongklakAI(difficulty="easy")
         
-        # Créer la fenêtre
-        self.window = tk.Tk()
-        self.window.title("Congklak AI - Traditional Indonesian Game")
-        self.window.geometry("900x700")
-        self.window.configure(bg="#2C3E50")  # Fond bleu foncé
+        self.font_large = pygame.font.SysFont("Arial", 36, bold=True)
+        self.font_medium = pygame.font.SysFont("Arial", 24, bold=True)
+        self.font_small = pygame.font.SysFont("Arial", 18)
         
-        # Titre principal
-        title_label = tk.Label(
-            self.window, 
-            text="CONGKLAK", 
-            font=("Arial", 32, "bold"),
-            bg="#2C3E50",
-            fg="white"
-        )
-        title_label.grid(row=0, column=0, columnspan=8, pady=20)
+        self.selected_difficulty = "easy"
+        self.running = True
+        self.waiting_for_ai = False
         
-        # Créer le plateau
-        self.create_board()
+    def get_board_for_display(self):
+        """Convertit le board pour l'affichage (HOME INVERSE)"""
+        board_display = [0] * 16
         
-        # Démarrer le jeu
-        self.update_display()
+        # Trous joueur (P1) - ligne du BAS
+        for i in range(7):
+            board_display[i] = self.game.board[i + 1]  # 1-7
+        
+        # Home joueur (P1) - À DROITE maintenant
+        board_display[7] = self.game.board[8]  # Home humain
+        
+        # Trous IA (P2) - ligne du HAUT
+        for i in range(7):
+            board_display[8 + i] = self.game.board[i + 9]  # 9-15
+        
+        # Home IA (P2) - À GAUCHE maintenant
+        board_display[15] = self.game.board[0]  # Home IA
+        
+        return board_display
     
-    def create_board(self):
-        """Crée le plateau de jeu avec le design de l'image"""
-        # Cadre principal du plateau
-        board_frame = tk.Frame(self.window, bg="#34495E", relief="raised", bd=5)
-        board_frame.grid(row=1, column=0, columnspan=8, padx=20, pady=20)
+    def draw_board(self):
+        self.screen.fill(COLOR_BG)
         
-        # ---------- SECTION ADVERSARY ----------
-        # Titre adversaire (IA)
-        self.opponent_label = tk.Label(
-            board_frame,
-            text="OPPONENT",
-            font=("Arial", 18, "bold"),
-            bg="#34495E",
-            fg="#ECF0F1"
-        )
-        self.opponent_label.grid(row=0, column=0, columnspan=7, pady=10)
+        # Dessin du plateau principal
+        pygame.draw.rect(self.screen, COLOR_BOARD, (50, 150, 900, 250), border_radius=30)
         
-        # Score adversaire
-        self.opponent_score = tk.Label(
-            board_frame,
-            text="0",
-            font=("Arial", 28, "bold"),
-            bg="#E74C3C",  # Rouge
-            fg="white",
-            width=4,
-            height=2,
-            relief="sunken"
-        )
-        self.opponent_score.grid(row=0, column=7, padx=10)
+        # Titre
+        title = self.font_large.render("CONGKLAK", True, COLOR_TEXT)
+        self.screen.blit(title, (500 - title.get_width()//2, 30))
         
-        # Trous adversaire (7 trous, de droite à gauche comme dans l'image)
-        self.opponent_holes = []
+        # Affichage difficulté
+        diff_text = self.font_small.render(f"Difficulté: {self.selected_difficulty.upper()}", 
+                                          True, COLOR_TEXT)
+        self.screen.blit(diff_text, (500 - diff_text.get_width()//2, 80))
+        
+        # Homes INVERSE
+        board = self.get_board_for_display()
+        
+        # Home IA (GAUCHE)
+        pygame.draw.circle(self.screen, COLOR_AI, (120, 275), 60)
+        ai_home_text = self.font_large.render(str(board[15]), True, (255, 255, 255))
+        self.screen.blit(ai_home_text, (120 - ai_home_text.get_width()//2, 275 - ai_home_text.get_height()//2))
+        
+        # Home Joueur (DROITE)
+        pygame.draw.circle(self.screen, COLOR_PLAYER, (880, 275), 60)
+        home_text = self.font_large.render(str(board[7]), True, (255, 255, 255))
+        self.screen.blit(home_text, (880 - home_text.get_width()//2, 275 - home_text.get_height()//2))
+        
+        # Labels (INVERSE aussi)
+        ai_label = self.font_medium.render("IA", True, COLOR_AI)
+        player_label = self.font_medium.render("VOUS", True, COLOR_PLAYER)
+        self.screen.blit(ai_label, (120 - ai_label.get_width()//2, 340))
+        self.screen.blit(player_label, (880 - player_label.get_width()//2, 340))
+        
+        # Trous IA (ligne du HAUT) - SANS NUMÉROS
+        self.ai_holes_rects = []
         for i in range(7):
-            hole = tk.Label(
-                board_frame,
-                text="7",
-                font=("Arial", 16, "bold"),
-                bg="#16A085",  # Vert turquoise
-                fg="white",
-                width=4,
-                height=2,
-                relief="ridge"
-            )
-            hole.grid(row=1, column=6-i, padx=5, pady=5)
-            self.opponent_holes.append(hole)
+            x = 280 + i * 70
+            y = 210  # Plus haut
+            
+            # Déterminer la couleur en fonction du contenu
+            stones = board[8+i]
+            if stones > 0:
+                hole_color = COLOR_AI
+            else:
+                hole_color = (180, 180, 180)  # Gris pour vide
+            
+            pygame.draw.circle(self.screen, hole_color, (x, y), 30)
+            
+            # Nombre de billes seulement
+            if stones > 0:
+                count_text = self.font_medium.render(str(stones), True, (255, 255, 255))
+                self.screen.blit(count_text, (x - count_text.get_width()//2, y - count_text.get_height()//2))
+            
+            # Indices de trous IA (9-15 dans le jeu)
+            self.ai_holes_rects.append((pygame.Rect(x-30, y-30, 60, 60), i+9))
         
-        # ---------- SECTION PLAYER ----------
-        # Trous joueur (7 trous, de gauche à droite)
-        self.player_holes = []
+        # Trous Joueur (ligne du BAS) - SANS NUMÉROS
+        self.player_holes_rects = []
         for i in range(7):
-            btn = tk.Button(
-                board_frame,
-                text="7",
-                font=("Arial", 16, "bold"),
-                bg="#3498DB",  # Bleu
-                fg="white",
-                width=4,
-                height=2,
-                relief="raised",
-                command=lambda idx=1+i: self.human_move(idx)
-            )
-            btn.grid(row=2, column=i, padx=5, pady=5)
-            self.player_holes.append(btn)
+            x = 280 + i * 70
+            y = 340  # Plus bas
+            
+            # Déterminer la couleur en fonction du contenu
+            stones = board[i]
+            if stones > 0:
+                hole_color = COLOR_PLAYER
+            else:
+                hole_color = (180, 180, 180)  # Gris pour vide
+            
+            pygame.draw.circle(self.screen, hole_color, (x, y), 30)
+            
+            # Nombre de billes seulement
+            if stones > 0:
+                count_text = self.font_medium.render(str(stones), True, (255, 255, 255))
+                self.screen.blit(count_text, (x - count_text.get_width()//2, y - count_text.get_height()//2))
+            
+            # Indices de trous Joueur (1-7) dans le jeu
+            self.player_holes_rects.append((pygame.Rect(x-30, y-30, 60, 60), i+1))
         
-        # Titre joueur (Vous)
-        self.player_label = tk.Label(
-            board_frame,
-            text="YOU",
-            font=("Arial", 18, "bold"),
-            bg="#34495E",
-            fg="#ECF0F1"
-        )
-        self.player_label.grid(row=3, column=0, columnspan=7, pady=10)
+        # Indicateur de tour - CORRECTION: vérifier fin de jeu en premier
+        turn_y = 420
         
-        # Score joueur
-        self.player_score = tk.Label(
-            board_frame,
-            text="0",
-            font=("Arial", 28, "bold"),
-            bg="#2ECC71",  # Vert
-            fg="white",
-            width=4,
-            height=2,
-            relief="sunken"
-        )
-        self.player_score.grid(row=3, column=7, padx=10)
+        # CORRECTION: Vérifier d'abord si le jeu est terminé
+        if self.game.is_game_over():
+            # Déterminer le gagnant
+            player_score = board[7]
+            ai_score = board[15]
+            if player_score > ai_score:
+                turn_text = self.font_medium.render("VOUS GAGNEZ !", True, COLOR_PLAYER)
+            elif ai_score > player_score:
+                turn_text = self.font_medium.render("L'IA GAGNE !", True, COLOR_AI)
+            else:
+                turn_text = self.font_medium.render("ÉGALITÉ !", True, COLOR_TEXT)
+            self.screen.blit(turn_text, (500 - turn_text.get_width()//2, turn_y))
+        elif self.game.current_player == 0 and not self.waiting_for_ai:  # Tour du joueur
+            turn_text = self.font_medium.render("À VOTRE TOUR", True, COLOR_PLAYER)
+            self.screen.blit(turn_text, (500 - turn_text.get_width()//2, turn_y))
+        elif self.game.current_player == 1 or self.waiting_for_ai:  # Tour de l'IA
+            turn_text = self.font_medium.render("L'IA RÉFLÉCHIT...", True, COLOR_AI)
+            self.screen.blit(turn_text, (500 - turn_text.get_width()//2, turn_y))
         
-        # ---------- INFORMATIONS DE JEU ----------
-        info_frame = tk.Frame(self.window, bg="#2C3E50")
-        info_frame.grid(row=2, column=0, columnspan=8, pady=20)
+        # Score (INVERSE)
+        score_text = self.font_small.render(f"Score: IA {board[15]} - {board[7]} VOUS", 
+                                           True, COLOR_TEXT)
+        self.screen.blit(score_text, (500 - score_text.get_width()//2, 460))
         
-        # Game Mode
-        tk.Label(
-            info_frame,
-            text="GAME MODE",
-            font=("Arial", 12, "bold"),
-            bg="#2C3E50",
-            fg="#BDC3C7"
-        ).grid(row=0, column=0, padx=10)
-        
-        self.mode_label = tk.Label(
-            info_frame,
-            text="Standard7×2",
-            font=("Arial", 12),
-            bg="#34495E",
-            fg="white",
-            width=15,
-            relief="flat"
-        )
-        self.mode_label.grid(row=0, column=1, padx=10)
-        
-        # Difficulty
-        tk.Label(
-            info_frame,
-            text="DIFFICULTY",
-            font=("Arial", 12, "bold"),
-            bg="#2C3E50",
-            fg="#BDC3C7"
-        ).grid(row=0, column=2, padx=10)
-        
-        self.difficulty_label = tk.Label(
-            info_frame,
-            text="Medium",
-            font=("Arial", 12),
-            bg="#F39C12",  # Orange
-            fg="white",
-            width=10,
-            relief="flat"
-        )
-        self.difficulty_label.grid(row=0, column=3, padx=10)
-        
-        # Seeds Type
-        tk.Label(
-            info_frame,
-            text="SEEDS",
-            font=("Arial", 12, "bold"),
-            bg="#2C3E50",
-            fg="#BDC3C7"
-        ).grid(row=0, column=4, padx=10)
-        
-        self.seeds_label = tk.Label(
-            info_frame,
-            text="Gemstones",
-            font=("Arial", 12),
-            bg="#9B59B6",  # Violet
-            fg="white",
-            width=12,
-            relief="flat"
-        )
-        self.seeds_label.grid(row=0, column=5, padx=10)
-        
-        # ---------- CONTROLES ----------
-        controls_frame = tk.Frame(self.window, bg="#2C3E50")
-        controls_frame.grid(row=3, column=0, columnspan=8, pady=10)
-        
-        # Boutons de contrôle
-        buttons = [
-            ("UNDO", "#95A5A6"),
-            ("HINT", "#3498DB"),
-            ("SETTINGS", "#7F8C8D"),
-            ("NEW GAME", "#E74C3C")
+        # Boutons de difficulté
+        self.draw_buttons()
+    
+    def draw_buttons(self):
+        difficulties = [
+            ("FACILE", (200, 500), COLOR_SEED, "easy"),
+            ("MOYEN", (400, 500), (255, 165, 0), "medium"),
+            ("DIFFICILE", (600, 500), COLOR_AI, "hard"),
+            ("NOUVEAU", (800, 500), (70, 130, 180), "new")
         ]
         
-        for i, (text, color) in enumerate(buttons):
-            btn = tk.Button(
-                controls_frame,
-                text=text,
-                font=("Arial", 12, "bold"),
-                bg=color,
-                fg="white",
-                width=12,
-                height=2,
-                relief="raised"
-            )
-            btn.grid(row=0, column=i, padx=5)
-        
-        # Label tour actuel
-        self.turn_label = tk.Label(
-            self.window,
-            text="YOUR TURN",
-            font=("Arial", 14, "bold"),
-            bg="#2C3E50",
-            fg="#F1C40F"  # Jaune
-        )
-        self.turn_label.grid(row=4, column=0, columnspan=8, pady=10)
-    
-    def human_move(self, hole_index):
-        """Gère le coup du joueur humain"""
-        if self.game.current_player == 0:  # C'est bien le tour du joueur
-            self.game.make_move(hole_index)
-            self.update_display()
+        self.buttons = []
+        for text, pos, color, action in difficulties:
+            rect = pygame.Rect(pos[0] - 60, pos[1] - 20, 120, 40)
+            pygame.draw.rect(self.screen, color, rect, border_radius=10)
+            pygame.draw.rect(self.screen, (50, 50, 50), rect, 2, border_radius=10)
             
-            # Vérifier si la partie continue
-            if not self.game.is_game_over():
-                # L'IA joue après un délai
-                self.turn_label.config(text="AI THINKING...")
-                self.window.after(1000, self.ai_move)
+            btn_text = self.font_small.render(text, True, (255, 255, 255))
+            self.screen.blit(btn_text, (pos[0] - btn_text.get_width()//2, 
+                                        pos[1] - btn_text.get_height()//2))
+            
+            self.buttons.append((rect, action))
+    
+    def handle_click(self, pos):
+        x, y = pos
+        
+        # Vérifier les boutons
+        for rect, action in self.buttons:
+            if rect.collidepoint(x, y):
+                if action == "new":
+                    self.game = CongklakGame()
+                    self.waiting_for_ai = False
+                    return
+                elif action in ["easy", "medium", "hard"]:
+                    self.ai = CongklakAI(difficulty=action)
+                    self.selected_difficulty = action
+                    return
+        
+        # Si c'est le tour de l'IA, ne pas accepter les clics
+        if self.game.current_player == 1 or self.waiting_for_ai:
+            return
+        
+        # Vérifier les trous du joueur
+        if self.game.current_player == 0:  # Tour du joueur
+            for rect, hole_idx in self.player_holes_rects:
+                if rect.collidepoint(x, y):
+                    # Vérifier que le trou a des billes
+                    if self.game.board[hole_idx] > 0:
+                        # Faire le coup
+                        self.game.make_move(hole_idx)
+                        
+                        # Vérifier si le jeu est terminé
+                        if not self.game.is_game_over():
+                            # Si le joueur rejoue (dernière bille dans son home)
+                            if self.game.current_player == 0:
+                                return  # Le joueur rejoue
+                            else:
+                                # C'est le tour de l'IA
+                                self.waiting_for_ai = True
+                                return
+                        else:
+                            # Fin du jeu
+                            return
     
     def ai_move(self):
         """L'IA joue son coup"""
-        if self.game.current_player == 1:  # C'est le tour de l'IA
-            best_move = self.ai.get_best_move(self.game)
-            if best_move is not None:
-                self.game.make_move(best_move)
-                self.update_display()
-    
-    def update_display(self):
-        """Met à jour l'affichage du plateau"""
-        # Mettre à jour les trous adversaire
-        for i in range(7):
-            self.opponent_holes[i]["text"] = str(self.game.board[8 + i])
-        
-        # Mettre à jour les trous joueur
-        for i in range(7):
-            self.player_holes[i]["text"] = str(self.game.board[1 + i])
-        
-        # Mettre à jour les scores
-        self.opponent_score["text"] = str(self.game.board[0])  # Home adversaire
-        self.player_score["text"] = str(self.game.board[8])    # Home joueur
-        
-        # Mettre à jour le label de tour
-        if self.game.current_player == 0:
-            self.turn_label.config(text="YOUR TURN", fg="#2ECC71")  # Vert
-        else:
-            self.turn_label.config(text="OPPONENT'S TURN", fg="#E74C3C")  # Rouge
-        
-        # Désactiver/activer les boutons selon le tour
-        for i in range(7):
-            if self.game.current_player == 0:
-                self.player_holes[i]["state"] = "normal"
-                self.player_holes[i]["bg"] = "#3498DB"  # Bleu normal
+        if self.game.current_player == 1:  # Tour de l'IA
+            moves = self.game.get_possible_moves(1)
+            if moves:  # Vérifier qu'il y a des coups possibles
+                pygame.time.wait(500)
+                best_move = self.ai.get_best_move(self.game)
+                if best_move is not None:
+                    self.game.make_move(best_move)
+            
+            # Si l'IA rejoue (dernière bille dans son home)
+            if self.game.current_player == 1 and not self.game.is_game_over():
+                # L'IA rejoue immédiatement
+                self.ai_move()
             else:
-                self.player_holes[i]["state"] = "disabled"
-                self.player_holes[i]["bg"] = "#2980B9"  # Bleu foncé désactivé
+                self.waiting_for_ai = False
     
     def run(self):
-        """Lance l'application"""
-        self.window.mainloop()
+        clock = pygame.time.Clock()
+        
+        while self.running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.running = False
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:  # Clic gauche
+                        self.handle_click(event.pos)
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        self.running = False
+                    elif event.key == pygame.K_n:
+                        self.game = CongklakGame()  # Nouvelle partie
+                        self.waiting_for_ai = False
+                    elif event.key == pygame.K_1:
+                        self.ai = CongklakAI(difficulty="easy")
+                        self.selected_difficulty = "easy"
+                    elif event.key == pygame.K_2:
+                        self.ai = CongklakAI(difficulty="medium")
+                        self.selected_difficulty = "medium"
+                    elif event.key == pygame.K_3:
+                        self.ai = CongklakAI(difficulty="hard")
+                        self.selected_difficulty = "hard"
+            
+            # Si on attend que l'IA joue
+            if self.waiting_for_ai and not self.game.is_game_over():
+                # Attendre un peu pour que l'IA "réfléchisse"
+                pygame.time.delay(800)  # 800ms de délai
+                self.ai_move()
+                self.waiting_for_ai = False
+            
+            self.draw_board()
+            pygame.display.flip()
+            clock.tick(60)
+        
+        pygame.quit()
+        sys.exit()
 
-# Pour lancer le jeu
 if __name__ == "__main__":
-    app = CongklakGUI()
+    app = CongklakPygameGUI()
     app.run()
