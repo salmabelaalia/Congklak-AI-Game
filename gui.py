@@ -162,10 +162,10 @@ class CongklakPygameGUI:
     
     def draw_buttons(self):
         difficulties = [
-            ("FACILE", (200, 500), COLOR_SEED, "easy"),
-            ("MOYEN", (400, 500), (255, 165, 0), "medium"),
-            ("DIFFICILE", (600, 500), COLOR_AI, "hard"),
-            ("NOUVEAU", (800, 500), (70, 130, 180), "new")
+            ("FACILE", (200, 520), COLOR_SEED, "easy"),      # ← Changé: 500 → 520
+            ("MOYEN", (400, 520), (255, 165, 0), "medium"),  # ← Changé: 500 → 520
+            ("DIFFICILE", (600, 520), COLOR_AI, "hard"),     # ← Changé: 500 → 520
+            ("NOUVEAU", (800, 520), (70, 130, 180), "new")   # ← Changé: 500 → 520
         ]
         
         self.buttons = []
