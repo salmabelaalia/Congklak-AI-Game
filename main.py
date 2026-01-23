@@ -1,16 +1,35 @@
-# main.py
+# main.py - Version avec design amélioré
 from gui import CongklakGUI
 
-def main():
-    print("Lancement du jeu Congklak avec IA...")
-    print("Règles du jeu:")
-    print("- Cliquez sur un de vos trous pour distribuer les billes")
-    print("- L'IA répondra automatiquement")
-    print("- Le jeu se termine quand tous les trous sont vides")
+def display_welcome():
+    """Affiche un message de bienvenue stylisé"""
+    print("╔══════════════════════════════════════════════════════╗")
+    print("║           CONGKLAK AI - GAME LAUNCHER               ║")
+    print("╠══════════════════════════════════════════════════════╣")
+    print("║  Traditional Indonesian Board Game                  ║")
+    print("║  with Minimax AI Implementation                     ║")
+    print("╠══════════════════════════════════════════════════════╣")
+    print("║  RULES:                                             ║")
+    print("║  • Click on your holes to distribute seeds          ║")
+    print("║  • AI responds automatically                        ║")
+    print("║  • Game ends when all holes are empty               ║")
+    print("║  • Capture opponent's seeds for bonus points        ║")
+    print("╚══════════════════════════════════════════════════════╝")
     print()
+    print("🎮 Starting game with modern interface...")
+    print("⚙️  Difficulty: Medium | Mode: Standard 7×2 | Seeds: Gemstones")
+    print()
+
+def main():
+    display_welcome()
     
-    app = CongklakGUI()
-    app.run()
+    try:
+        app = CongklakGUI()
+        app.run()
+    except Exception as e:
+        print(f"❌ Error launching game: {e}")
+        print("Please ensure all files are in the same directory.")
+        input("Press Enter to exit...")
 
 if __name__ == "__main__":
     main()
