@@ -1,5 +1,5 @@
 # new_main.py
-from new_gui import CongklakPygameGUI
+from gui import CongklakPygameGUI
 
 def main():
     print("=" * 50)
