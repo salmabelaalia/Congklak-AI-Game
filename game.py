@@ -30,8 +30,8 @@ class CongklakGame:
         
         moves = []
         if player == 0:  # Humain
-            # Trous 1-7 (mais attention: dans notre représentation, 1-7 = IA)
-            # Correction: pour l'humain, ce sont les trous 9-15
+            # Trous 1-7 = IA
+            # Pour l'humain, ce sont les trous 9-15
             for i in range(9, 16):
                 if self.board[i] > 0:
                     moves.append(i)
@@ -121,7 +121,6 @@ class CongklakGame:
             return True
         
         # RÈGLE 6: Continuer si dernière bille dans trou occupé
-        # (déjà géré par la logique normale)
         
         # Sinon, changer de joueur
         self.switch_player()

@@ -1,4 +1,4 @@
-# new_gui.py - Interface corrigée (sans numéros, IA fonctionnelle)
+# new_gui.py - Interface 
 import pygame
 import sys
 from game import CongklakGame
@@ -130,10 +130,10 @@ class CongklakPygameGUI:
             # Indices de trous Joueur (1-7) dans le jeu
             self.player_holes_rects.append((pygame.Rect(x-30, y-30, 60, 60), i+1))
         
-        # Indicateur de tour - CORRECTION: vérifier fin de jeu en premier
+        # Indicateur de tour - vérifier fin de jeu en premier
         turn_y = 420
         
-        # CORRECTION: Vérifier d'abord si le jeu est terminé
+        # Vérifier d'abord si le jeu est terminé
         if self.game.is_game_over():
             # Déterminer le gagnant
             player_score = board[7]
