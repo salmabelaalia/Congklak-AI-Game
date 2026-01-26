@@ -1,4 +1,3 @@
-# new_gui.py - Interface 
 import pygame
 import sys
 from game import CongklakGame
@@ -130,10 +129,10 @@ class CongklakPygameGUI:
             # Indices de trous Joueur (1-7) dans le jeu
             self.player_holes_rects.append((pygame.Rect(x-30, y-30, 60, 60), i+1))
         
-        # Indicateur de tour - vérifier fin de jeu en premier
+        # Indicateur de tour - CORRECTION: vérifier fin de jeu en premier
         turn_y = 420
         
-        # Vérifier d'abord si le jeu est terminé
+        # CORRECTION: Vérifier d'abord si le jeu est terminé
         if self.game.is_game_over():
             # Déterminer le gagnant
             player_score = board[7]
@@ -162,10 +161,10 @@ class CongklakPygameGUI:
     
     def draw_buttons(self):
         difficulties = [
-            ("FACILE", (200, 520), COLOR_SEED, "easy"),      # ← Changé: 500 → 520
-            ("MOYEN", (400, 520), (255, 165, 0), "medium"),  # ← Changé: 500 → 520
-            ("DIFFICILE", (600, 520), COLOR_AI, "hard"),     # ← Changé: 500 → 520
-            ("NOUVEAU", (800, 520), (70, 130, 180), "new")   # ← Changé: 500 → 520
+            ("FACILE", (200, 520), COLOR_SEED, "easy"),
+            ("MOYEN", (400, 520), (255, 165, 0), "medium"),
+            ("DIFFICILE", (600, 520), COLOR_AI, "hard"),
+            ("NOUVEAU", (800, 520), (70, 130, 180), "new")
         ]
         
         self.buttons = []
@@ -182,7 +181,7 @@ class CongklakPygameGUI:
     
     def handle_click(self, pos):
         x, y = pos
-        
+    
         # Vérifier les boutons
         for rect, action in self.buttons:
             if rect.collidepoint(x, y):
@@ -194,11 +193,20 @@ class CongklakPygameGUI:
                     self.ai = CongklakAI(difficulty=action)
                     self.selected_difficulty = action
                     return
-        
+    
+        # RÈGLE 7: Si le joueur n'a pas de coups possibles, passer le tour
+        if self.game.current_player == 0:
+            moves = self.game.get_possible_moves(0)
+            if not moves:  # Pas de coups possibles
+                # Passer le tour à l'IA
+                self.game.current_player = 1
+                self.waiting_for_ai = True
+                return
+    
         # Si c'est le tour de l'IA, ne pas accepter les clics
         if self.game.current_player == 1 or self.waiting_for_ai:
             return
-        
+    
         # Vérifier les trous du joueur
         if self.game.current_player == 0:  # Tour du joueur
             for rect, hole_idx in self.player_holes_rects:
@@ -206,19 +214,19 @@ class CongklakPygameGUI:
                     # Vérifier que le trou a des billes
                     if self.game.board[hole_idx] > 0:
                         # Faire le coup
-                        self.game.make_move(hole_idx)
-                        
+                        should_play_again = self.game.make_move(hole_idx)
+                    
                         # Vérifier si le jeu est terminé
-                        if not self.game.is_game_over():
-                            # Si le joueur rejoue (dernière bille dans son home)
-                            if self.game.current_player == 0:
-                                return  # Le joueur rejoue
-                            else:
-                                # C'est le tour de l'IA
-                                self.waiting_for_ai = True
-                                return
+                        if self.game.is_game_over():
+                            # Fin du jeu, pas de tour suivant
+                            return
+                    
+                        # Si le joueur rejoue (RÈGLE 4)
+                        if should_play_again and self.game.current_player == 0:
+                            return  # Le joueur rejoue
                         else:
-                            # Fin du jeu
+                            # C'est le tour de l'IA
+                            self.waiting_for_ai = True
                             return
     
     def ai_move(self):

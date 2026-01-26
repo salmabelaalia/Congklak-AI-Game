@@ -1,3 +1,4 @@
+# new_main.py
 from gui import CongklakPygameGUI
 
 def main():
