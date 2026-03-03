@@ -1,189 +1,250 @@
-🎮 Congklak AI - Implémentation de Minimax avec Alpha-Beta Pruning
-Intelligence Artificielle pour le jeu traditionnel Congklak
-Projet universitaire M1 IA - Implémentation complète des règles de recherche
+# 🎮 Congklak — Minimax AI
 
+> Implémentation de l'algorithme **Minimax avec élagage Alpha-Bêta** comme joueur informatique dans le jeu traditionnel indonésien **Congklak**.
 
-============================================================
-📋 TABLE DES MATIÈRES
-============================================================
-🎯 Objectifs du Projet
-⚙️ Règles du Jeu Implémentées
-🧠 Algorithmes d'IA
-📁 Structure des Fichiers
-🚀 Installation et Exécution
-🎛️ Interface Utilisateur
-📊 Résultats et Performances
-📚 Références Académiques
+![Python](https://img.shields.io/badge/Python-3.8+-blue?logo=python&logoColor=white)
+![Tkinter](https://img.shields.io/badge/GUI-Tkinter-orange)
+![Algorithm](https://img.shields.io/badge/Algorithm-Minimax%20%2B%20Alpha--Beta-green)
+![License](https://img.shields.io/badge/License-MIT-purple)
 
-============================================================
-🎯 OBJECTIFS DU PROJET
-============================================================
-Ce projet vise à digitaliser le jeu traditionnel Congklak tout en
-implémentant une Intelligence Artificielle avancée basée sur la recherche.
+---
 
-Objectifs principaux :
-- Créer une application de jeu utilisant l’algorithme Minimax
-  avec élagage Alpha-Beta
-- Développer une IA performante capable de prendre des décisions
-  rapides (≤ 5 secondes)
-- Implémenter plusieurs niveaux de difficulté
-- Préserver le patrimoine culturel indonésien à travers le numérique
+## 📖 Description
 
-============================================================
-⚙️ RÈGLES DU JEU IMPLÉMENTÉES
-============================================================
-L’implémentation suit exactement les 8 règles définies dans l’article :
+Ce projet digitalise le jeu de plateau traditionnel **Congklak**, populaire en Indonésie et en Asie du Sud-Est. Il intègre une intelligence artificielle basée sur l'algorithme **Minimax optimisé par l'élagage Alpha-Bêta**, permettant à l'ordinateur de jouer de manière stratégique avec plusieurs niveaux de difficulté.
 
-1. Plateau avec 16 trous (14 petits + 2 homes)            
-2. 7 billes par trou (homes vides au départ)              
-3. Distribution anti-horaire (sowing)                     
-4. Rejouer si la dernière bille tombe dans son home       
-5. Capture (shooting) si dernière bille dans trou vide   
-6. Continuer si dernière bille dans trou occupé           
-7. Changement de joueur si aucun coup possible            
-8. Fin de jeu lorsque tous les trous sont vides           
+Ce travail est basé sur l'article de recherche :
+> *"Implementation of Minimax with Alpha-Beta Pruning as Computer Player in Congklak"*
+> — Brian Sumali, Ivan Michael Siregar, Rosalina — President University, Indonésie (2016)
 
-Particularité :
-La règle 5 (capture) est entièrement fonctionnelle,
-ce qui constitue une amélioration par rapport à de nombreuses
-implémentations existantes.
+---
 
-============================================================
-🧠 ALGORITHMES D'IA
-============================================================
-Minimax avec Élagage Alpha-Beta
+## 🎯 Objectifs
 
-La complexité est réduite de :
-O(b^m)  →  O(√(b^m))
+- ✅ Créer une application jouable de Congklak
+- ✅ Intégrer une IA intelligente comme adversaire
+- ✅ Proposer plusieurs niveaux de difficulté
+- ✅ Obtenir des décisions en moins de **2 secondes** par coup
+- ✅ Préserver et valoriser un jeu traditionnel via la digitalisation
 
-Comparaison :
-- Minimax standard :
-  - Nœuds explorés : ~36
-  - Temps de décision : ~1.5s
-  - Efficacité : moyenne
+---
 
-- Alpha-Beta Pruning :
-  - Nœuds explorés : ~3
-  - Temps de décision : ~0.3s
-  - Efficacité : excellente
+## 🕹️ Le Jeu Congklak
 
-Niveaux de difficulté :
-- FACILE     : profondeur 2  (< 0.5s)
-- MOYEN      : profondeur 4  (~ 1.0s)
-- DIFFICILE  : profondeur 6  (~ 1.5s)
+Le **Congklak** est un jeu de type **mancala** à deux joueurs, à information parfaite. Il sollicite la réflexion, la planification et les capacités mathématiques.
 
-============================================================
-📁 STRUCTURE DES FICHIERS
-============================================================
-congklak-ia/
-├── gui.py            : Interface graphique PyGame
-├── game.py           : Logique complète du jeu
-├── ai.py             : IA Minimax + Alpha-Beta
-├── main.py           : Point d’entrée principal
-└── 619-Article.pdf   : Article académique de référence
+### Plateau de jeu
 
-============================================================
-📜 DESCRIPTION DES SCRIPTS
-============================================================
-gui.py :
-- Interface graphique PyGame
-- Affichage du plateau
-- Gestion souris / clavier
-- Boutons de contrôle et scores
+```
+[MAISON IA = 0]  [1][2][3][4][5][6][7]              ← rangée de l'IA
+                 [8][9][10][11][12][13][14]  [MAISON VOUS = 15]  ← votre rangée
+```
 
-game.py :
-- Implémentation des 8 règles
-- Système de capture (règle 5)
-- Gestion des tours
-- Détection de fin de partie
-- Fonction d’évaluation
+- **16 cases** au total : 14 trous + 2 maisons
+- **Au départ** : 7 graines dans chaque trou, maisons vides
+- **But** : accumuler le plus de graines dans sa maison
 
-ai.py :
-- Algorithme Minimax avec Alpha-Beta
-- Trois niveaux de difficulté
-- Heuristiques d’évaluation
-- Optimisation mémoire
+### Règles spéciales
 
-main.py :
-- Lanceur principal
-- Initialisation du jeu
-- Gestion des erreurs
+| # | Situation | Résultat |
+|---|-----------|----------|
+| 4 | Dernière graine → **votre maison** | Vous **rejouez** |
+| 5 | Dernière graine → **trou vide** (votre côté) | **Capture** des graines du trou opposé |
+| 6 | Dernière graine → **trou occupé** (votre côté) | **Relais** : ramasser et continuer |
 
-============================================================
-🚀 INSTALLATION ET EXÉCUTION
-============================================================
-Prérequis :
-- Python 3.x
-- PyGame
+---
 
-Installation :
-pip install pygame
+## 🧠 Intelligence Artificielle
 
-Lancement :
-python main.py
-ou
-python gui.py
+### Algorithme Minimax
 
-============================================================
-🎯 RACCOURCIS CLAVIER
-============================================================
-1 / 2 / 3  : Changer difficulté
-N          : Nouvelle partie
-ECHAP      : Quitter le jeu
-Clic souris: Sélectionner un trou
+Minimax est une technique de recherche en profondeur (**DFS**) pour les jeux séquentiels à deux joueurs :
+- **MAX** = l'IA → cherche à **maximiser** son score
+- **MIN** = le joueur humain → cherche à **minimiser** le score de l'IA
 
-============================================================
-🎛️ INTERFACE UTILISATEUR
-============================================================
-Fonctionnalités :
-- Homes colorés (IA / joueur)
-- Trous interactifs
-- Animation pendant la réflexion de l’IA
-- Messages de fin de partie
-- Boutons accessibles
+```
+Complexité Minimax : O(b^p)
+→ explore TOUS les nœuds jusqu'à la profondeur p
+```
 
-============================================================
-📊 RÉSULTATS ET PERFORMANCES
-============================================================
-Tous les temps de décision sont inférieurs à 2 secondes.
-Objectif initial (< 5s) largement atteint.
+### Élagage Alpha-Bêta
 
-Tests fonctionnels :
-- Capture (règle 5)        
-- Rejouer (règle 4)        
-- Fin de partie            
-- Multi-difficultés        
+Optimisation de Minimax qui **réduit drastiquement** le nombre de nœuds explorés sans modifier le résultat :
 
-============================================================
-📚 RÉFÉRENCES ACADÉMIQUES
-============================================================
-"Implementation of Minimax with Alpha-Beta Pruning as Computer Player
-in Congklak"
+```
+α (alpha) : meilleure valeur garantie pour MAX (IA)
+β (bêta)  : meilleure valeur garantie pour MIN (Joueur)
 
-Brian Sumali
-Ivan Michael Siregar
-Rosalina
+Condition de coupe : si α ≥ β → on ignore la branche
+```
 
-President University, Indonesia
-Conference Proceedings, 2018
+```
+Complexité Alpha-Bêta : O(b^(p/2))
+→ Minimax explore 36 nœuds, Alpha-Bêta seulement 3 !
+```
 
-============================================================
-👥 CONTRIBUTIONS ET PERSPECTIVES
-============================================================
-Améliorations apportées :
-- Capture complète (règle 5)
-- Interface moderne avec PyGame
-- Optimisations Alpha-Beta
-- Documentation complète en français
+### Fonction d'évaluation
 
-Perspectives futures :
-- Apprentissage par renforcement
-- Mode multijoueur en réseau
-- Statistiques de parties
-- Tutoriel intégré
+```python
+def evaluate(state):
+    return state.board[P2_HOME] - state.board[P1_HOME]
+    # Positif = l'IA avantage, Négatif = le joueur avantage
+```
 
-============================================================
-🎓 Projet académique M1 Intelligence Artificielle
-📅 Janvier 2026
-🏆 Toutes les règles du Congklak traditionnel sont respectées
-============================================================
+### Les 3 fonctions principales
+
+| Fonction | Rôle |
+|----------|------|
+| `GetMove(S)` | Point d'entrée — choisit le **meilleur trou** à jouer |
+| `GetMax(S, α, β, D)` | Recherche la **valeur maximale** (tour IA) |
+| `GetMin(S, α, β, D)` | Recherche la **valeur minimale** (tour joueur) |
+
+---
+
+## 🎚️ Niveaux de difficulté
+
+| Niveau | Stratégie | Profondeur | Temps moyen |
+|--------|-----------|-----------|-------------|
+| 🟢 Facile | Coup **aléatoire** | — | < 0.01s |
+| 🟡 Normal | Minimax | 2 | ~0.30s |
+| 🟠 Expert | Minimax | 4 | ~0.70s |
+| 🔴 Impossible | Minimax | 6 | ~1.30s |
+
+> ⚠️ Au niveau **Impossible**, l'IA gagne systématiquement si elle joue en premier.
+
+---
+
+## 🏗️ Architecture du code
+
+```
+congklak.py
+│
+├── CongklakState          # Partie 1 : Plateau de jeu
+│   ├── __init__()         # Initialise le plateau (16 cases, 7 graines)
+│   ├── clone()            # Copie du plateau (pour simulations IA)
+│   ├── get_holes()        # Retourne les trous d'un joueur
+│   ├── get_home()         # Retourne la maison d'un joueur
+│   ├── get_opponent()     # Retourne l'adversaire
+│   ├── get_opposite()     # Retourne le trou en face
+│   ├── legal_moves()      # Coups légaux disponibles
+│   └── is_terminal()      # Vérifie si la partie est finie
+│
+├── do_move_full()         # Partie 2 : Exécution d'un coup complet
+│   ├── Règle 4            # Dernière graine → maison → rejouer
+│   ├── Règle 5            # Dernière graine → trou vide → capture
+│   └── Règle 6            # Dernière graine → trou occupé → relais
+│
+├── MinimaxAI              # Partie 3 : Intelligence Artificielle
+│   ├── evaluate()         # Fonction d'évaluation heuristique
+│   ├── GetMove()          # Choisit le meilleur coup (point d'entrée)
+│   ├── GetMax()           # Maximise le score (tour IA)
+│   └── GetMin()           # Minimise le score (tour joueur)
+│
+└── CongklakGUI            # Partie 4 : Interface graphique (Tkinter)
+    ├── _build_main_menu() # Affiche le menu principal
+    ├── _open_settings()   # Paramètres (niveau, premier joueur)
+    ├── _build_game_screen()# Plateau de jeu visuel
+    ├── _human_move()      # Gestion du coup humain
+    ├── _ai_move()         # Déclenchement du coup IA
+    └── _end_game()        # Affichage du résultat final
+```
+
+---
+
+## 🚀 Installation et lancement
+
+### Prérequis
+
+- **Python 3.8+**
+- **Tkinter** (inclus par défaut avec Python)
+
+### Cloner le projet
+
+```bash
+git clone https://github.com/salmabelaalia/Congklak-AI-Game.git
+cd Congklak-AI-Game
+```
+
+### Lancer le jeu
+
+```bash
+python congklak.py
+```
+
+> 💡 **Conseil** : Lancez depuis le terminal ou un éditeur (VS Code, PyCharm) pour éviter l'icône du navigateur dans la barre des tâches.
+
+---
+
+## 🖥️ Interface
+
+```
+┌─────────────────────────────────────────┐
+│  🎮 Congklak — Minimax AI               │
+├─────────────────────────────────────────┤
+│                                         │
+│   ⚬  CONGKLAK  ⚬                       │
+│   Jeu traditionnel indonésien           │
+│                                         │
+│   ▶  Jouer contre l'IA                 │
+│   ℹ  Règles du jeu                     │
+│   ✕  Quitter                           │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+### Écran de jeu
+
+```
+[Maison IA]  [1][2][3][4][5][6][7]              [        ]
+[          ] [8][9][10][11][12][13][14] [Maison VOUS]
+
+Vous: 0  •  IA: 0  •  En jeu: 98
+IA: trou 3  |  temps: 0.32s  |  noeuds explorés: 247
+```
+
+---
+
+## 📊 Performances
+
+Temps de calcul enregistrés pour les 5 premiers coups :
+
+| Coup | Normal (~0.3s) | Expert (~0.7s) | Impossible (~1.3s) |
+|------|---------------|----------------|-------------------|
+| 1er  | 0.32s | 0.93s | 1.10s |
+| 2ème | 0.29s | 0.70s | 0.70s |
+| 3ème | 0.28s | 0.64s | 1.29s |
+| 4ème | 0.34s | 0.32s | 1.50s |
+| 5ème | 0.27s | 0.35s | 0.30s |
+
+✅ Temps toujours **< 2 secondes** — IA fluide en temps réel.
+
+---
+
+## 🔍 Analyse critique
+
+### Points forts
+- ✅ Algorithme Minimax adapté aux jeux à information parfaite
+- ✅ Utilisation efficace de l'Alpha-Beta Pruning
+- ✅ Réduction significative du nombre de nœuds explorés
+- ✅ Implémentation complète et fonctionnelle
+- ✅ Bonne prise en compte des règles spécifiques (relais, capture, tour bonus)
+- ✅ Temps de réponse acceptable pour une application interactive
+
+### Points faibles
+- ⚠️ Fonction d'évaluation trop simplifiée (différence brute de graines)
+- ⚠️ Profondeur de recherche limitée à 6
+- ⚠️ Absence de mécanisme d'apprentissage automatique
+- ⚠️ IA basée uniquement sur des règles fixes
+- ⚠️ Manque de comparaison avec d'autres approches (Monte-Carlo, Deep Learning)
+
+---
+
+## 📚 Références
+
+- Sumali, B., Siregar, I.M., Rosalina (2016). *Implementation of Minimax with Alpha-Beta Pruning as Computer Player in Congklak*. Jurnal Teknik Informatika dan Sistem Informasi, Vol. 2, No. 2.
+- Russell, S. & Norvig, P. (2009). *Artificial Intelligence: A Modern Approach* (3rd Edition).
+- Fuller, S.H., Gaschnig, J.G., Gillogly (1973). *Analysis of the Alpha-Beta Pruning*. Carnegie Mellon University.
+
+## 📄 Licence
+
+Ce projet est sous licence **MIT** — libre d'utilisation, modification et distribution.
